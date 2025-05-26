@@ -15,7 +15,12 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-
+      - name: Validate VPS_HOST
+        run: |
+          if [ -z "${{ secrets.VPS_HOST }}" ]; then
+            echo "Error: VPS_HOST is not defined." >&2
+            exit 1
+          fi
       - name: Configure SSH access
         run: |
           set -e
