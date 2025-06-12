@@ -43,7 +43,7 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << "EOF"
             cd ~/deploy/${{ github.event.repository.name }}
-            echo "SPRING_MAIL_HOST=${{ secrets.MAIL_HOST }}" >> .env
+            echo "SPRING_MAIL_HOST=${{ secrets.MAIL_HOST }}" > .env
             echo "SPRING_MAIL_PORT=${{ secrets.MAIL_PORT }}" >> .env
             echo "SPRING_MAIL_USERNAME=${{ secrets.MAIL_USERNAME }}" >> .env
             echo "SPRING_MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}" >> .env
