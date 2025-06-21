@@ -48,7 +48,7 @@ public class EmailServiceImpl implements EmailService {
                 "Hola,\n\n" +
                 "Hemos recibido una solicitud para restablecer tu contraseña. Por favor, haz clic en el enlace a continuación:\n" +
                 resetLink + "\n\n" +
-                "Este enlace expirará en 1 hora. Si no solicitaste esto, ignora este correo.\n\n" +
+                "Este enlace expirará en 15 minutos. Si no solicitaste el cambio, ignora este correo.\n\n" +
                 "Saludos,\n" +
                 "Equipo de GTU"
         );
