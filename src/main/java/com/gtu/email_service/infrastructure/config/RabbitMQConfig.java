@@ -19,6 +19,15 @@ public class RabbitMQConfig {
     @Value("${rabbitmq.routingkey.email}")
     private String emailRoutingKey;
 
+    @Value("${rabbitmq.queue.reset}")
+    private String resetQueue;
+
+    @Value("${rabbitmq.exchange.reset}")
+    private String resetExchange;
+
+    @Value("${rabbitmq.routingkey.reset}")
+    private String resetRoutingKey;
+
     @Bean
     public Queue emailQueue() {
         return new Queue(emailQueue, true);
@@ -32,5 +41,20 @@ public class RabbitMQConfig {
     @Bean
     public Binding emailBinding(Queue emailQueue, DirectExchange emailExchange) {
         return BindingBuilder.bind(emailQueue).to(emailExchange).with(emailRoutingKey);
+    }
+
+    @Bean
+    public Queue resetQueue() {
+        return new Queue(resetQueue, true);
+    }
+
+    @Bean
+    public DirectExchange resetExchange() {
+        return new DirectExchange(resetExchange);
+    }
+
+    @Bean
+    public Binding resetBinding(Queue resetQueue, DirectExchange resetExchange) {
+        return BindingBuilder.bind(resetQueue).to(resetExchange).with(resetRoutingKey);
     }
 }
