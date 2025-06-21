@@ -1,6 +1,7 @@
 package com.gtu.email_service.application.service;
 
 import com.gtu.email_service.domain.model.Email;
+import com.gtu.email_service.domain.model.Role;
 import com.gtu.email_service.domain.service.EmailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.mail.SimpleMailMessage;
@@ -32,10 +33,25 @@ public class EmailServiceImpl implements EmailService {
                 "Usuario: " + to + "\n" +
                 "Contraseña: " + password + "\n\n" +
 
-                "¡Esperamos que disfrutes de nuestra plataforma, no olvides restablecer tu contraseña al iniciar sesión!\n\n" +
+                "¡Esperamos que disfrutes de nuestra plataforma, no olvides actualizar tu contraseña al iniciar sesión!\n\n" +
                 "Saludos,\n" +
                 "Equipo de GTU"
         );
         sendEmail(email); 
+    }
+
+    public void sendResetEmail(String to, Role role, String resetLink) {
+        Email email = new Email();
+        email.setTo(to);
+        email.setSubject("Restablecimiento de Contraseña - GTU");
+        email.setBody(
+                "Hola,\n\n" +
+                "Hemos recibido una solicitud para restablecer tu contraseña. Por favor, haz clic en el enlace a continuación:\n" +
+                resetLink + "\n\n" +
+                "Este enlace expirará en 1 hora. Si no solicitaste esto, ignora este correo.\n\n" +
+                "Saludos,\n" +
+                "Equipo de GTU"
+        );
+        sendEmail(email);
     }
 }

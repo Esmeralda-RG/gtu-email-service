@@ -1,6 +1,7 @@
 package com.gtu.email_service.infrastructure.messaging;
 
 import com.gtu.email_service.application.service.EmailServiceImpl;
+import com.gtu.email_service.infrastructure.messaging.event.ResetPasswordEvent;
 import com.gtu.email_service.infrastructure.messaging.event.UserCreatedEvent;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,16 @@ public class EmailMessageConsumer {
         try {
             UserCreatedEvent event = objectMapper.readValue(message, UserCreatedEvent.class);
             emailService.sendWelcomeEmail(event.getEmail(), event.getUsername(), event.getPassword());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @RabbitListener(queues = "${rabbitmq.queue.reset}")
+    public void receiveResetPasswordMessage(String message) {
+        try {
+            ResetPasswordEvent event = objectMapper.readValue(message, ResetPasswordEvent.class);
+            emailService.sendResetEmail(event.getTo(), event.getRole(), event.getResetLink());
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -47,6 +47,9 @@ jobs:
             echo "MAIL_PORT=${{ secrets.MAIL_PORT }}" >> .env
             echo "MAIL_USERNAME=${{ secrets.MAIL_USERNAME }}" >> .env
             echo "MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}" >> .env
+            echo "RABBITMQ_HOST=${{ secrets.RABBITMQ_HOST }}" >> .env
+            echo "RABBITMQ_USERNAME=${{ secrets.RABBITMQ_USERNAME }}" >> .env
+            echo "RABBITMQ_PASSWORD=${{ secrets.RABBITMQ_PASSWORD }}" >> .env
             docker compose down --remove-orphans
             docker compose build
             docker compose up -d --remove-orphans
