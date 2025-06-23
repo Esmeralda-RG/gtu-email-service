@@ -1,0 +1,21 @@
+version: '3.8'
+services:
+  gtu-email-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - SPRING_RABBITMQ_HOST=${RABBITMQ_HOST}
+      - SPRING_RABBITMQ_PORT=5672
+      - SPRING_RABBITMQ_USERNAME=${RABBITMQ_USERNAME}
+      - SPRING_RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD}
+      - SPRING_MAIL_HOST=${MAIL_HOST}
+      - SPRING_MAIL_PORT=${MAIL_PORT}
+      - SPRING_MAIL_USERNAME=${MAIL_USERNAME}
+      - SPRING_MAIL_PASSWORD=${MAIL_PASSWORD}
+      - SERVER_PORT=0
+    networks:
+      - shared_network
+networks:
+  shared_network:
+    external: true
