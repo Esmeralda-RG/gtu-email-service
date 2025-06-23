@@ -19,7 +19,8 @@ import org.springframework.mail.javamail.JavaMailSender;
 import com.gtu.email_service.domain.model.Email;
 import com.gtu.email_service.domain.model.Role;
 
-class EmailServiceImplTest {
+public class EmailServiceImplTest {
+
     private JavaMailSender mailSender;
     private EmailServiceImpl emailService;
 
@@ -50,8 +51,39 @@ class EmailServiceImplTest {
     @Test
     void testSendEmailWithNullValues() {
         Email email = new Email();
-        assertThrows(IllegalArgumentException.class, () -> emailService.sendEmail(email));
+        assertThrows(IllegalArgumentException.class, () -> emailService.sendEmail(email),
+                "Should throw exception for null or empty email fields");
 
+        verifyNoInteractions(mailSender);
+    }
+
+    @Test
+    void testSendEmailWithNullTo() {
+        Email email = new Email();
+        email.setSubject("Test Subject");
+        email.setBody("Test Body");
+        assertThrows(IllegalArgumentException.class, () -> emailService.sendEmail(email),
+                "Should throw exception for null to");
+        verifyNoInteractions(mailSender);
+    }
+
+    @Test
+    void testSendEmailWithNullSubject() {
+        Email email = new Email();
+        email.setTo("test@example.com");
+        email.setBody("Test Body");
+        assertThrows(IllegalArgumentException.class, () -> emailService.sendEmail(email),
+                "Should throw exception for null subject");
+        verifyNoInteractions(mailSender);
+    }
+
+    @Test
+    void testSendEmailWithNullBody() {
+        Email email = new Email();
+        email.setTo("test@example.com");
+        email.setSubject("Test Subject");
+        assertThrows(IllegalArgumentException.class, () -> emailService.sendEmail(email),
+                "Should throw exception for null body");
         verifyNoInteractions(mailSender);
     }
 
@@ -71,18 +103,16 @@ class EmailServiceImplTest {
 
     @Test
     void testSendWelcomeEmailWithNullTo() {
-        assertThrows(IllegalArgumentException.class, () -> 
-            emailService.sendWelcomeEmail(null, "username", "1234"), "Should throw exception for null 'to' address");
-            
+        assertThrows(IllegalArgumentException.class, () -> emailService.sendWelcomeEmail(null, "username", "1234"),
+                "Should throw exception for null to address");
         verify(mailSender, never()).send(any(SimpleMailMessage.class));
     }
 
     @Test
     void testSendResetEmail() {
-        Role dummyRole = Role.ADMIN; 
         String resetLink = "http://example.com/reset?token=abc123";
 
-        emailService.sendResetEmail("reset@example.com", dummyRole, resetLink);
+        emailService.sendResetEmail("reset@example.com", Role.ADMIN, resetLink);
 
         ArgumentCaptor<SimpleMailMessage> captor = ArgumentCaptor.forClass(SimpleMailMessage.class);
         verify(mailSender).send(captor.capture());
@@ -97,8 +127,7 @@ class EmailServiceImplTest {
     @Test
     void testSendResetEmailWithNullTo() {
         assertThrows(IllegalArgumentException.class, () -> emailService.sendResetEmail(null, Role.ADMIN, "http://example.com/reset"),
-                "Should throw exception for null 'to' address");
-
+                "Should throw exception for null to address");
         verify(mailSender, never()).send(any(SimpleMailMessage.class));
     }
 }
