@@ -1,25 +1,23 @@
 package com.gtu.email_service.infrastructure.messaging;
 
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
+import com.gtu.email_service.application.service.EmailServiceImpl;
+import com.gtu.email_service.domain.model.Role;
+import com.gtu.email_service.infrastructure.messaging.event.ResetPasswordEvent;
+import com.gtu.email_service.infrastructure.messaging.event.UserCreatedEvent;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.gtu.email_service.application.service.EmailServiceImpl;
-import com.gtu.email_service.infrastructure.messaging.event.ResetPasswordEvent;
-import com.gtu.email_service.infrastructure.messaging.event.UserCreatedEvent;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
 
 class EmailMessageConsumerTest {
-    @Mock 
+
+    @Mock
     private EmailServiceImpl emailService;
 
     @Mock
@@ -48,25 +46,36 @@ class EmailMessageConsumerTest {
     }
 
     @Test
+    void testReceiveMessageWithInvalidJson() throws Exception {
+        when(objectMapper.readValue(anyString(), eq(UserCreatedEvent.class)))
+                .thenThrow(new RuntimeException("JSON parsing error"));
+
+        emailMessageConsumer.receiveMessage("invalid json");
+
+        verify(emailService, never()).sendWelcomeEmail(any(), any(), any());
+    }
+
+    @Test
     void testReceiveResetPasswordMessage() throws Exception {
         ResetPasswordEvent event = new ResetPasswordEvent();
         event.setTo("reset@example.com");
-        event.setRole(com.gtu.email_service.domain.model.Role.ADMIN);
+        event.setRole(Role.ADMIN);
         event.setResetLink("http://example.com/reset");
 
         when(objectMapper.readValue(anyString(), eq(ResetPasswordEvent.class))).thenReturn(event);
 
         emailMessageConsumer.receiveResetPasswordMessage("{\"to\":\"reset@example.com\",\"role\":\"ADMIN\",\"resetLink\":\"http://example.com/reset\"}");
 
-        verify(emailService, times(1)).sendResetEmail("reset@example.com", com.gtu.email_service.domain.model.Role.ADMIN, "http://example.com/reset");
+        verify(emailService, times(1)).sendResetEmail("reset@example.com", Role.ADMIN, "http://example.com/reset");
     }
 
     @Test
-    void testReceiveMessageWithException() throws Exception {
-        when(objectMapper.readValue(anyString(), eq(UserCreatedEvent.class))).thenThrow(new RuntimeException("JSON parsing error"));
+    void testReceiveResetPasswordMessageWithInvalidJson() throws Exception {
+        when(objectMapper.readValue(anyString(), eq(ResetPasswordEvent.class)))
+                .thenThrow(new RuntimeException("JSON parsing error"));
 
-        emailMessageConsumer.receiveMessage("invalid json");
+        emailMessageConsumer.receiveResetPasswordMessage("invalid json");
 
-        verify(emailService, never()).sendWelcomeEmail(anyString(), anyString(), anyString());
+        verify(emailService, never()).sendResetEmail(any(), any(), any());
     }
 }
