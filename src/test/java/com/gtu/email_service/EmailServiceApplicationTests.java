@@ -13,6 +13,6 @@ class EmailServiceApplicationTests {
 
     @Test
     void contextLoads() {
+        // Test to ensure Spring application context loads correctly.
     }
 }
-

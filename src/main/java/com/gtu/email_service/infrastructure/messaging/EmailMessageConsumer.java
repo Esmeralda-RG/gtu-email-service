@@ -25,7 +25,7 @@ public class EmailMessageConsumer {
             UserCreatedEvent event = objectMapper.readValue(message, UserCreatedEvent.class);
             emailService.sendWelcomeEmail(event.getEmail(), event.getUsername(), event.getPassword());
         } catch (Exception e) {
-            logger.error("Failed to proccess welcome email message: {}", message, e);
+            logger.error("Failed to process welcome email message: {}", message, e);
         }
     }
 
