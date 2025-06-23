@@ -19,7 +19,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import com.gtu.email_service.domain.model.Email;
 import com.gtu.email_service.domain.model.Role;
 
-public class EmailServiceImplTest {
+class EmailServiceImplTest {
 
     private JavaMailSender mailSender;
     private EmailServiceImpl emailService;
