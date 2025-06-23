@@ -15,7 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
     "spring.mail.username=test@example.com",
     "spring.mail.password=testpass",
 })
-public class RabbitMQConfigTest {
+class RabbitMQConfigTest {
 
     @Autowired
     private ApplicationContext context;
