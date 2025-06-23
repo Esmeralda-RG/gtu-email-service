@@ -16,6 +16,9 @@ public class EmailServiceImpl implements EmailService {
 
     @Override
     public void sendEmail(Email email) {
+        if (email.getTo() == null || email.getSubject() == null || email.getBody() == null) {
+            throw new IllegalArgumentException("Email fields cannot be null");
+        }
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(email.getTo());
         message.setSubject(email.getSubject());
