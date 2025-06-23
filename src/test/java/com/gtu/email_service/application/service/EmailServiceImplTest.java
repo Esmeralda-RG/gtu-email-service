@@ -1,10 +1,14 @@
 package com.gtu.email_service.application.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,7 +19,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import com.gtu.email_service.domain.model.Email;
 import com.gtu.email_service.domain.model.Role;
 
-public class EmailServiceImplTest {
+class EmailServiceImplTest {
     private JavaMailSender mailSender;
     private EmailServiceImpl emailService;
 
@@ -44,6 +48,14 @@ public class EmailServiceImplTest {
     }
 
     @Test
+    void testSendEmailWithNullValues() {
+        Email email = new Email();
+        assertThrows(IllegalArgumentException.class, () -> emailService.sendEmail(email));
+
+        verifyNoInteractions(mailSender);
+    }
+
+    @Test
     void testSendWelcomeEmail() {
         emailService.sendWelcomeEmail("user@example.com", "username", "1234");
 
@@ -55,6 +67,14 @@ public class EmailServiceImplTest {
         assertEquals("Bienvenido a GTU - Tus Credenciales", message.getSubject());
         assertTrue(message.getText().contains("Usuario: user@example.com"));
         assertTrue(message.getText().contains("Contraseña: 1234"));
+    }
+
+    @Test
+    void testSendWelcomeEmailWithNullTo() {
+        assertThrows(IllegalArgumentException.class, () -> 
+            emailService.sendWelcomeEmail(null, "username", "1234"), "Should throw exception for null 'to' address");
+            
+        verify(mailSender, never()).send(any(SimpleMailMessage.class));
     }
 
     @Test
@@ -72,5 +92,13 @@ public class EmailServiceImplTest {
         assertEquals("Restablecimiento de Contraseña - GTU", message.getSubject());
         assertTrue(message.getText().contains(resetLink));
         assertTrue(message.getText().contains("Este enlace expirará en 15 minutos."));
+    }
+
+    @Test
+    void testSendResetEmailWithNullTo() {
+        assertThrows(IllegalArgumentException.class, () -> emailService.sendResetEmail(null, Role.ADMIN, "http://example.com/reset"),
+                "Should throw exception for null 'to' address");
+
+        verify(mailSender, never()).send(any(SimpleMailMessage.class));
     }
 }
