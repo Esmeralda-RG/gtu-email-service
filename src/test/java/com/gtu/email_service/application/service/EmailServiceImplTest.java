@@ -18,16 +18,19 @@ import org.springframework.mail.javamail.JavaMailSender;
 
 import com.gtu.email_service.domain.model.Email;
 import com.gtu.email_service.domain.model.Role;
+import com.gtu.email_service.infrastructure.logs.LogPublisher;
 
 class EmailServiceImplTest {
 
     private JavaMailSender mailSender;
     private EmailServiceImpl emailService;
+    private LogPublisher logPublisher;
 
     @BeforeEach
     void setUp() {
         mailSender = mock(JavaMailSender.class);
-        emailService = new EmailServiceImpl(mailSender);
+        logPublisher = mock(LogPublisher.class);
+        emailService = new EmailServiceImpl(mailSender, logPublisher);
     }
 
     @Test
@@ -126,7 +129,8 @@ class EmailServiceImplTest {
 
     @Test
     void testSendResetEmailWithNullTo() {
-        assertThrows(IllegalArgumentException.class, () -> emailService.sendResetEmail(null, Role.ADMIN, "http://example.com/reset"),
+        assertThrows(IllegalArgumentException.class,
+                () -> emailService.sendResetEmail(null, Role.ADMIN, "http://example.com/reset"),
                 "Should throw exception for null to address");
         verify(mailSender, never()).send(any(SimpleMailMessage.class));
     }
