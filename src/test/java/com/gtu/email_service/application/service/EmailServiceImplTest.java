@@ -18,16 +18,21 @@ import org.springframework.mail.javamail.JavaMailSender;
 
 import com.gtu.email_service.domain.model.Email;
 import com.gtu.email_service.domain.model.Role;
+import com.gtu.email_service.infrastructure.logs.LogPublisher;
+
+import java.util.Map;
 
 class EmailServiceImplTest {
 
     private JavaMailSender mailSender;
+    private LogPublisher logPublisher;
     private EmailServiceImpl emailService;
 
     @BeforeEach
     void setUp() {
         mailSender = mock(JavaMailSender.class);
-        emailService = new EmailServiceImpl(mailSender);
+        logPublisher = mock(LogPublisher.class);
+        emailService = new EmailServiceImpl(mailSender, logPublisher);
     }
 
     @Test
@@ -46,6 +51,13 @@ class EmailServiceImplTest {
         assertEquals("test@example.com", captured.getTo()[0]);
         assertEquals("Test Subject", captured.getSubject());
         assertEquals("Test Body", captured.getText());
+
+        verify(logPublisher, times(1)).sendLog(
+                any(String.class),
+                any(String.class),
+                any(String.class),
+                any(String.class),
+                any(Map.class));
     }
 
     @Test
@@ -55,6 +67,12 @@ class EmailServiceImplTest {
                 "Should throw exception for null or empty email fields");
 
         verifyNoInteractions(mailSender);
+        verify(logPublisher, times(1)).sendLog(
+                any(String.class),
+                any(String.class),
+                any(String.class),
+                any(String.class),
+                any(Map.class));
     }
 
     @Test
@@ -65,6 +83,12 @@ class EmailServiceImplTest {
         assertThrows(IllegalArgumentException.class, () -> emailService.sendEmail(email),
                 "Should throw exception for null to");
         verifyNoInteractions(mailSender);
+        verify(logPublisher, times(1)).sendLog(
+                any(String.class),
+                any(String.class),
+                any(String.class),
+                any(String.class),
+                any(Map.class));
     }
 
     @Test
@@ -75,6 +99,12 @@ class EmailServiceImplTest {
         assertThrows(IllegalArgumentException.class, () -> emailService.sendEmail(email),
                 "Should throw exception for null subject");
         verifyNoInteractions(mailSender);
+        verify(logPublisher, times(1)).sendLog(
+                any(String.class),
+                any(String.class),
+                any(String.class),
+                any(String.class),
+                any(Map.class));
     }
 
     @Test
@@ -85,6 +115,12 @@ class EmailServiceImplTest {
         assertThrows(IllegalArgumentException.class, () -> emailService.sendEmail(email),
                 "Should throw exception for null body");
         verifyNoInteractions(mailSender);
+        verify(logPublisher, times(1)).sendLog(
+                any(String.class),
+                any(String.class),
+                any(String.class),
+                any(String.class),
+                any(Map.class));
     }
 
     @Test
@@ -99,6 +135,13 @@ class EmailServiceImplTest {
         assertEquals("Bienvenido a GTU - Tus Credenciales", message.getSubject());
         assertTrue(message.getText().contains("Usuario: user@example.com"));
         assertTrue(message.getText().contains("Contraseña: 1234"));
+
+        verify(logPublisher, times(1)).sendLog(
+                any(String.class),
+                any(String.class),
+                any(String.class),
+                any(String.class),
+                any(Map.class));
     }
 
     @Test
@@ -106,6 +149,12 @@ class EmailServiceImplTest {
         assertThrows(IllegalArgumentException.class, () -> emailService.sendWelcomeEmail(null, "username", "1234"),
                 "Should throw exception for null to address");
         verify(mailSender, never()).send(any(SimpleMailMessage.class));
+        verify(logPublisher, times(2)).sendLog(
+                any(String.class),
+                any(String.class),
+                any(String.class),
+                any(String.class),
+                any(Map.class));
     }
 
     @Test
@@ -122,12 +171,26 @@ class EmailServiceImplTest {
         assertEquals("Restablecimiento de Contraseña - GTU", message.getSubject());
         assertTrue(message.getText().contains(resetLink));
         assertTrue(message.getText().contains("Este enlace expirará en 15 minutos."));
+
+        verify(logPublisher, times(1)).sendLog(
+                any(String.class),
+                any(String.class),
+                any(String.class),
+                any(String.class),
+                any(Map.class));
     }
 
     @Test
     void testSendResetEmailWithNullTo() {
-        assertThrows(IllegalArgumentException.class, () -> emailService.sendResetEmail(null, Role.ADMIN, "http://example.com/reset"),
+        assertThrows(IllegalArgumentException.class,
+                () -> emailService.sendResetEmail(null, Role.ADMIN, "http://example.com/reset"),
                 "Should throw exception for null to address");
         verify(mailSender, never()).send(any(SimpleMailMessage.class));
+        verify(logPublisher, times(2)).sendLog(
+                any(String.class),
+                any(String.class),
+                any(String.class),
+                any(String.class),
+                any(Map.class));
     }
 }
